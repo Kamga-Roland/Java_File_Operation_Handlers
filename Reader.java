@@ -2,44 +2,26 @@ package TP05;
 
 import java.io.*;
 import java.nio.file.*;
-import java.util.List;
 
 public class Reader {
     public static void main(String[] args) {
+        // Définition du nom du fichier à lire
         final String NOM_FICHIER = "parrot_output.txt";
 
-        try {
-            // Lire toutes les lignes du fichier en une seule fois
-            List<String> stringList = Files.readAllLines(Paths.get(NOM_FICHIER));
-
-            // Flux pour écrire vers la console et lire l'entrée utilisateur
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
-                 BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-
-                writer.write("Quelle ligne souhaitez-vous lire ?");
-                writer.newLine();
-                writer.flush();
-
-                int input = Integer.parseInt(reader.readLine());
-
-                // Opération de cloture et Vérification des bornes
-                while (input != -1) {
-                    if (input >= 0 && input < stringList.size()+1) {
-                        System.out.println(stringList.get(input-1));
-                        input = Integer.parseInt(reader.readLine());
-                    } else {
-                        System.out.println("Numéro de ligne incorrect");
-                        return;
-                    }
-                }
-
-            } catch (NumberFormatException e) {
-                System.err.println("input incorrect");
+        // Bloc try-with-resources : permet d'ouvrir plusieurs flux et garantit leur fermeture automatique
+        try (
+                FileInputStream fis = new FileInputStream(NOM_FICHIER); // Ouverture d'un flux de lecture binaire sur l>
+                InputStreamReader isr = new InputStreamReader(fis);     // Conversion du flux binaire en flux de caract>
+                BufferedReader br = new BufferedReader(isr)             // Ajout d'un tampon pour lire efficacement lig>
+        ) {
+            String ligne;
+            // Boucle de lecture : lit chaque ligne du fichier jusqu'à atteindre la fin (null)
+            while ((ligne = br.readLine()) != null) {
+                System.out.println(ligne); // Affiche chaque ligne lue dans la console
             }
         } catch (IOException e) {
+            // Gestion des erreurs : si le fichier n'existe pas ou qu'une erreur survient
             System.err.println("Erreur lors de la lecture du fichier : " + e.getMessage());
-        } catch (NumberFormatException e) {
-            System.err.println("Entrée invalide : veuillez entrer un nombre.");
         }
     }
 }
